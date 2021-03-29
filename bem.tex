@@ -11,8 +11,9 @@ The function $g(\bx, \by)$ is a Green's function, $f$ is a given right-hand side
 \begin{figure}
 	\center
 	\includegraphics[width=5cm]{img/sphere}
-	\label{fig:triangulation}
 	\caption{Discretisation of a sphere into flat surface triangles.}
+		\label{fig:triangulation}
+
 \end{figure}
 
 The first step is the \textbf{definition of the surface} $\Gamma$. Surfaces are represented in Bempp-cl as a triangulation into flat triangles (see \ref{fig:triangulation}). The triangulation is internally represented as an array of node coordinates and an associated connectivity array of node indices that define each triangle. In this step also topology data is computed. In particular, for each triangle the neighboring triangles and the type of intersection (i.e. via joint node or edge) is computed.
@@ -41,10 +42,12 @@ In the final step, \textbf{Bempp solves the underlying linear system of equation
 
 In summary, to solve a boundary integral equation problem, the following steps are performed by Bempp
 \begin{enumerate}
-	\item Import of the surface description as triangulation data
-	\item Definition of the trial space, test space and range space
-	\item Discretization into a matrix problem $Ax=b$
-	\item Evaluation of domain potential operators for visualization and post-processing
+	\item Import of the surface description as triangulation data.
+	\item Definition of the trial space, test space and range space.
+	\item Discretization into a matrix problem $Ax=b$.
+	\item Solution of the matrix problem by either a direct or iterative solver.
+	\item Evaluation of domain potential operators for visualization and post-processing.
 \end{enumerate}
 
 All of these steps are accelerated through the use of either Numba or OpenCL. In the following section we provide a high-level overview of the library and how these acceleration techniques are deployed before we deep dive into the design of the computational kernels.
+
