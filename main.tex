@@ -6,8 +6,6 @@
 \definecolor{bemppgrey}{HTML}{555555}
 \definecolor{bempporange}{HTML}{FF7A1A}
 
-\usepackage{biblatex}
-
 \usepackage{pythonhighlight}
 
 \usepackage{tikz}
@@ -36,9 +34,6 @@
 % Discrete vector and discrete matrix
 \newcommand{\dmat}[1]{\mathbf{#1}}
 \newcommand{\dvec}[1]{\mathbf{#1}}
-
-
-\addbibresource{references.bib}
 
 
 \jvol{XX}
@@ -78,7 +73,14 @@ The Bempp boundary element library is a well known library for the simulation of
 \input{bempp_overview}
 \input{opencl}
 
-\printbibliography
+\bibliographystyle{IEEEtran}
+\begin{thebibliography}{1}
+
+\bibitem{Bempp-cl}
+T. Betcke and M. W. Scroggs, ``Bempp-cl: A fast Python based just-in-time compiling boundary element library,''
+{\it Journal of Open Source Software}, vol. 6, no. 59, p. 2879, 2021.
+\textsc{doi}: \href{https://dx.doi.org/10.21105/joss.02879}{10.21105/joss.02879}
+\end{thebibliography}
 
 \end{document}
 

@@ -1,12 +1,16 @@
-\section{Assembling boundary integral operators with OpenCL}
+\section{ASSEMBLING BOUNDARY INTEGRAL OPERATORS WITH OPENCL}
 
-In this section we discuss in more detail the assembly of boundary integral operators with OpenCL
+In this section, we discuss in more detail the assembly of boundary integral operators with OpenCL
 and how we integrated this into our Python workflow. We start with a brief introduction to OpenCL and then
 dive into how we use OpenCL as part of Bempp-cl.
 
 \subsection{What is OpenCL?}
 
-OpenCL (\url{https://www.khronos.org/opencl/}) is a heterogeneous compute standard for CPUs, GPUs, FPGAs, and other types of devices that provide conformant drivers. At its core OpenCL executes compute kernels that can be written in C99, or more recently, in C++. The current version of OpenCL is 3.0, though the most widely implemented standard is OpenCL 1.2, which Bempp-cl uses. OpenCL splits the computational tasks into work-items, each of which represents a single execution of a compute kernel. Work items are grouped together into work-groups, which share local memory. Barrier synchronization is only allowed within a work-group. All work-items are uniquely indexed by a one, two, or three dimensional index space, called NDRange. Kernels are launched onto a compute device (e.g. CPU or GPU) from a host device. OpenCL allows kernels to be loaded as strings and compiled on the fly for a given device, making it well suited for launching from high-productivity languages. To launch an OpenCL kernel the following steps need to be performed.
+OpenCL (\url{https://www.khronos.org/opencl/}) is a heterogeneous compute standard for CPUs, GPUs, FPGAs, and other types of devices that provide conformant drivers. At its core, OpenCL executes compute kernels that can be written in C99, or (more recently) in C++. The current version of OpenCL is 3.0, though the most widely implemented standard is OpenCL 1.2, which Bempp-cl uses.
+
+OpenCL splits computational tasks into work-items, each of which represents a single execution of a compute kernel. Work items are grouped together into work groups, which share local memory. Barrier synchronization is only allowed within a work group. All work items are uniquely indexed by a one, two, or three dimensional index space, called NDRange. Kernels are launched onto a compute device (e.g., a CPU or GPU) from a host device. OpenCL allows kernels to be loaded as strings and compiled on the fly for a given device, making it well suited for launching from high-productivity languages.
+
+To launch an OpenCL kernel the following steps need to be performed:
 \begin{itemize}
 	\item Initialize buffers on the compute device.
 	\item Compute relevant data from host to the compute device.
@@ -64,8 +68,8 @@ A completely different SIMD strategy is based on batching together quadrature ev
 
 The assembly of the singular part of an integral operator works a bit differently. Remember that the singular part consists of triangle parts which are adjacent to each other or identical. There are $\mathcal{O}(N)$ of such pairs. We are using fully numerical quadrature rules for these integrals that are based on subdividing the four-dimensional integration domain and using transformation techniques to remove the singularities. This gives highly accurate evaluations of these integration pairs but requires a large number (typically over $1000$) quadrature points per triangle pair. Hence, we create one workgroup for each triangle pair and inside this workgroup have a number of work-items that are evaluating the quadrature rules and then at the end sum up the result together. Depending on how two triangles are in relationship to each other different types of singular quadrature rules are needed. We solve this pre-loading all possible quadrature rules onto the device and also store for each triangle pair an index into the required quadrature rule so that the kernel function can select the correct rule to evaluate. For the singular quadrature rules we did not implement separate SIMD optimized kernels as the proposed implementation is already highly efficient and requires only a fraction of the computational time of the regular quadrature rules described above. At the end, the singular integral values are either summed into the overall result matrix, or if desired by the user, stored as separate sparse matrix.
 
-\section{Numba assembly of integral operators}
+\section{NUMBA ASSEMBLY OF INTEGRAL OPERATORS}
 
 The Numba assembly of integral operators is structured differently from the OpenCL assembly. In OpenCL we create a large number of work-items that are executed in parallel on the compute device by the runtime system with the details of the parallel execution left to the device driver. For Numba we use classical loop based parallelism. Each loop iteration is the assembly of one test element with all trial elements. Within each loop we partially optimized for SIMD instruction, though this depends on the autovectorization of the just-in-time compiler and cannot be explicitly targeted in Numba. Again, we separate regular and singular interactions. In the next section we give some more details on SIMD optimization in Numba at the example of the Laplace kernel.
 
-\section{SIMD optimized evaluation of the Laplace kernel with Numba}
+\section{SIMD OPTIMIZED EVALUATION OF THE LAPLACE KERNEL WITH NUMBA}
