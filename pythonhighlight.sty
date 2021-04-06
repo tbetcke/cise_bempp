@@ -32,7 +32,7 @@ language=python,
 showtabs=true,
 tab=,
 tabsize=2,
-basicstyle=\ttfamily\footnotesize,%\setstretch{.5},
+basicstyle=\ttfamily\small,%\setstretch{.5},
 stringstyle=\color{stringcolour},
 showstringspaces=false,
 alsoletter={1234567890},
@@ -135,7 +135,7 @@ language=c,
 showtabs=true,
 tab=,
 tabsize=2,
-basicstyle=\ttfamily\footnotesize,
+basicstyle=\ttfamily\small,
 stringstyle=\color{stringcolour},
 showstringspaces=false,
 alsoletter={1234567890},
@@ -156,5 +156,10 @@ breakindent=.5\textwidth,breaklines=true%
 }
 
 
+\lstdefinestyle{myopenclinline}{
+style=myopencl,%
+basicstyle=\ttfamily,%
+}
+
 \lstnewenvironment{opencl}[1][]{\lstset{style=myopencl}}{}
-\newcommand*{\ocl}{\lstinline[style=myopencl]}
+\newcommand*{\ocl}{\lstinline[style=myopenclinline]}
