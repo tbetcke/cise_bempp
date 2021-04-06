@@ -83,7 +83,7 @@ literate=*%
 {>>>}{\pythonprompt}{3}%
 ,%
 frame=tb,
-rulecolor=\color{gray},
+rulecolor=\color{black},
 backgroundcolor=\color{white},
 breakindent=.5\textwidth,breaklines=true%
 }
@@ -128,3 +128,33 @@ literate=*%
 
 \newcommand*{\pythstring}[1]{{\ttfamily\color{stringcolour}#1}}
 
+
+%%%%%%%%%%%% OpenCL highlighting
+\lstdefinestyle{myopencl}{
+language=c,
+showtabs=true,
+tab=,
+tabsize=2,
+basicstyle=\ttfamily\footnotesize,
+stringstyle=\color{stringcolour},
+showstringspaces=false,
+alsoletter={1234567890},
+otherkeywords={//},
+keywordstyle=\color{keywordcolour}\bfseries,
+morecomment=[s]{/*}{*/},
+commentstyle=\color{commentcolour}\slshape,
+emph={[4]int,uint,void,char},
+emphstyle=[4]\color{bemppgrey}\bfseries,
+emph={[5]REALTYPE},
+emphstyle=[5]\color{bempporange}\bfseries,
+emph={[6]__global,__kernel,__constant},
+emphstyle=[6]\color{bemppgrey}\bfseries,
+frame=tb,
+rulecolor=\color{black},
+backgroundcolor=\color{white},
+breakindent=.5\textwidth,breaklines=true%
+}
+
+
+\lstnewenvironment{opencl}[1][]{\lstset{style=myopencl}}{}
+\newcommand*{\ocl}{\lstinline[style=myopencl]}

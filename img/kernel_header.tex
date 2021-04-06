@@ -1,0 +1,21 @@
+\begin{opencl}
+#include "bempp_base_types.h"
+#include "bempp_helpers.h"
+#include "bempp_spaces.h"
+#include "kernels.h"
+
+__kernel void kernel_function(
+    __global uint* testIndices, __global uint* trialIndices,
+    __global int* testNormalSigns, __global int* trialNormalSigns,
+    __global REALTYPE* testGrid, __global REALTYPE* trialGrid,
+    __global uint* testConnectivity, __global uint* trialConnectivity,
+    __global uint* testLocal2Global, __global uint* trialLocal2Global,
+    __global REALTYPE* testLocalMultipliers, __global REALTYPE* trialLocalMultipliers,
+    __constant REALTYPE* quadPoints, __constant REALTYPE* quadWeights,
+    __global REALTYPE* globalResult,
+    __global REALTYPE* kernel_parameters,
+    int nTest, int nTrial, char gridsAreDisjoint)
+{
+  /* */
+}
+\end{opencl}

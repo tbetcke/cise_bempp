@@ -22,7 +22,7 @@ Python has excellent OpenCL support through the PyOpenCL library by Andreas Kloe
 
 \begin{figure*}
 	\center
-	\includegraphics[width=12cm]{img/kernel_header}
+	\input{img/kernel_header}
 	\caption{Definition of the OpenCL compute kernel for scalar integral equations.}
 	\label{fig:kernel_definition}
 \end{figure*}
@@ -45,7 +45,7 @@ Bempp-cl has OpenCL kernels for all its boundary operators. All operators have t
 \end{itemize}
 The actual kernel definition is shown in Figure \ref{fig:kernel_definition}.
 Before the kernel can be launched, it needs to be configured and just-in-time compiled. Kernel configuration happens through C-style preprocessor definitions that are passed through the just-in-time compiler. These include the names of the test and trial space, the name of the function that evaluates the integral kernel, choosing between single and double precision types, and for SIMD enhanced kernel the vector length of the SIMD types.
-For example, in Figure \ref{fig:kernel_definition} all floating point types have the name REALTYPE. This is substituted with either \textit{float} or \textit{double} during just-in-time compilation.
+For example, in Figure \ref{fig:kernel_definition} all floating point types have the name \ocl{REALTYPE}. This is substituted with either \textit{float} or \textit{double} during just-in-time compilation.
 
 Each work-item computes via numerical quadrature all interactions via the integral kernel of basis functions on the trial element with basis functions on the test element. Before summing the result into the global result buffer, the kernel checks via the connectivity information if the test and trial triangle are adjoint or identical. For this it simply checks if at at least one of the node indices of the test triangle is identical to one of the node indices of the trial triangle. If this is true and the grids are not disjoint, the result of the kernel is discarded and not summed back into the global result buffer. The reason is that for adjoint triangles a separate singular quadrature rule is used. The effect is that a few work-items do work that is discarded. However, in a grid with $N$ elements the number of triangle pairs requiring a singular quadrature rule is $\mathcal{O}(N)$, while the total number of interactions is $N^2$. Hence, only a tiny fraction of work-items are discarded.
 
