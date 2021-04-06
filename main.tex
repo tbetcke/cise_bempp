@@ -3,7 +3,12 @@
 \usepackage[colorlinks,urlcolor=blue,linkcolor=blue,citecolor=blue]{hyperref}
 
 \usepackage{xcolor}
+\definecolor{bemppgrey}{HTML}{555555}
+\definecolor{bempporange}{HTML}{FF7A1A}
+
 \usepackage{biblatex}
+
+\usepackage{pythonhighlight}
 
 \usepackage{tikz}
 \usetikzlibrary{arrows,decorations.pathreplacing}
@@ -15,17 +20,23 @@
 \usepackage{amsmath, amssymb}
 
 \usepackage{cleveref}
-\crefname{equation}{}{}
-\crefname{figure}{figure}{figures}
+\crefname{equation}{Equation}{Equations}
+\Crefname{equation}{Equation}{Equations}
+\crefname{figure}{Figure}{Figures}
 \Crefname{figure}{Figure}{Figures}
+\crefname{section}{Section}{Sections}
+\Crefname{section}{Section}{Sections}
 
+% Bold vector (for points in R^3)
 \newcommand{\bvec}[1]{\boldsymbol{#1}}
 \def\bx{\bvec{x}}
 \def\by{\bvec{y}}
-\newcommand{\ds}[1][]{\,\mathrm{d}s\ifthenelse{\equal{#1}{}}{}{(#1)}}
+\newcommand{\ds}[1][]{\,\mathrm{d}s\ifthenelse{\equal{#1}{}}{}{_{#1}}}
 
-\definecolor{bemppgrey}{HTML}{555555}
-\definecolor{bempporange}{HTML}{FF7A1A}
+% Discrete vector and discrete matrix
+\newcommand{\dmat}[1]{\mathbf{#1}}
+\newcommand{\dvec}[1]{\mathbf{#1}}
+
 
 \addbibresource{references.bib}
 
