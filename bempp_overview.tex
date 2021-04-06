@@ -11,7 +11,7 @@ The main user-visible component of Bempp-cl is the module \texttt{bempp.api}, wh
 
 Outside the operator discretisation, Numba is used in the following contexts:
 \begin{itemize}
-	\item Topological computations for the grid. Finding out all neighbour relationships between triangles requires parses through the grid data structure with linear complexity, which is accelerated with Numba.
+	\item Computing the grid topology:Topological computations for the grid. Finding out all neighbour relationships between triangles requires parses through the grid data structure with linear complexity, which is accelerated with Numba.
 	\item Definition of local-to-global maps for function spaces. Again, this requires traversal through the grid and assigning relationships between global and local indices.
 	\item Grid Functions. A right-hand side function $f$ can be defined as a Python callable. This is just-in-time compiled via Numba and then the product with the corresponding basis functions integrated in each triangle via numerical quadrature, again via Numba accelerated routines.
 	\item Sparse matrices. Sparse surface matrices are assembled through Numba accelerated routines.

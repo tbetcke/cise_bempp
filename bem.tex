@@ -4,11 +4,11 @@ In this section, we provide a brief introduction to boundary element methods and
 The most simple boundary integral equation is of the form
 \begin{align}
   \label{eq:bnd_integral}
-  \int_{\Gamma} g(\bx, \by)\phi(\by)\,\mathrm{d}s(\by) &= f(\bx),&&\bx\in\Gamma.
+  \int_{\Gamma} g(\bx, \by)\phi(\by)\ds[\by] &= f(\bx),&&\bx\in\Gamma.
 \end{align}
 The function $g(\bx, \by)$ is a Green's function, $f$ is a given right-hand side, and $\phi$ is an unknown surface density over the boundary $\Gamma$ of a bounded three dimensional domain $\Omega\subset\mathbb{R}^3$.
 
-As a concrete example, we consider computing the electrostatic capacity of an object $\Omega$. In this case, we solve the above equation with $f(\bx)=1$ and $g(\bx,\by)=\frac{1}{4\uppi|\bx - \by|}$. Once $\phi$ has been found, the normalised capacity is then obtained using $c = \frac{1}{4\uppi}\int_{\Gamma}\phi(\bx)\,\mathrm{d}s(\bx)$.
+As a concrete example, we consider computing the electrostatic capacity of an object $\Omega$. In this case, we solve the above equation with $f(\bx)=1$ and $g(\bx,\by)=\frac{1}{4\uppi|\bx - \by|}$. Once $\phi$ has been found, the normalised capacity is then obtained using $c = \frac{1}{4\uppi}\int_{\Gamma}\phi(\bx)\ds[\bx]$.
 
 Many practical problems have a significantly more complex structure and can involve block systems of integral equations. Nevertheless, the fundamental structure of what Bempp-cl does is well described by the above problem and will be described in the following.
 
@@ -29,15 +29,15 @@ Ax = b
 $$
 with
 \begin{align*}
-A_{ij} &= \int_{\Gamma}\psi_i(\bx)\int_{\Gamma}g(\bx, \by)\phi_j(\bx)\,\mathrm{d}s(\by)\,\mathrm{d}s(\bx)\\
-b_i &= \int_{\Gamma}\psi_i(\bx)f(\bx)\,\mathrm{d}s(\bx).
+A_{ij} &= \int_{\Gamma}\psi_i(\bx)\int_{\Gamma}g(\bx, \by)\phi_j(\bx)\ds[\by]\ds[\bx]\\
+b_i &= \int_{\Gamma}\psi_i(\bx)f(\bx)\ds[\bx].
 \end{align*}
-In the case of piecewise constant trial and test functions, the definition of $A_{ij}$ simplifies to $A_{ij} = \int_{\Gamma}\int_{\Gamma}g(\bx, \by)\,\mathrm{d}s(\by)\,\mathrm{d}s(\bx)$.
+In the case of piecewise constant trial and test functions, the definition of $A_{ij}$ simplifies to $A_{ij} = \int_{\Gamma}\int_{\Gamma}g(\bx, \by)\ds[\by]\ds[\bx]$.
 
 In Bempp-cl, an operator definition consists of the type of the operator (e.g. Laplace single-layer in the above example),
 the definition of the trial and test spaces, and the definition of the range space. The range space is required for operator
 products and not relevant for the purpose of this paper. The function $f$ is represented as a \textbf{grid function} object, which
-consists of either the dual representation in the forms of the integrals $b_i = \int_{\Gamma}\psi_i(\bx)f(\bx)\,\mathrm{d}s(x)$ or directly through its coefficients $f_j$ in the representation $f=\sum_{j=1}^N f_j\phi_j$.
+consists of either the dual representation in the forms of the integrals $b_i = \int_{\Gamma}\psi_i(\bx)f(\bx)\ds[\bx]$ or directly through its coefficients $f_j$ in the representation $f=\sum_{j=1}^N f_j\phi_j$.
 
 Once the grid, the space objects, and the operator(s) are defined, the main computational step is performed, namely the \textbf{computation of the discrete matrix entries} $A_{ij}$. For pairs of triangles $\tau_i$ and $\tau_j$ that do not share a joint edge or vertex this is done through a simple numerical quadrature rule that approximates $A_{ij}\approx \sum_{\ell}\sum_{q} g(\bx_\ell, \by_q)\psi_i(\bx_\ell)\phi_j(\by_q)\omega_\ell\omega_q$, where the $\bx_\ell$ and $\by_q$ are quadrature points in the corresponding triangles $\tau_i$ and $\tau_j$, and the values $\omega_i$ and $\omega_j$ are the quadrature weights. In the case that two triangles share a joint vertex/edge or the triangles $\tau_i$ and $\tau_j$ are identical, corresponding singularity adapted quadrature numerical quadrature rules are used that are based on singularity removing coordinate transformations.
 

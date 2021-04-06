@@ -8,6 +8,8 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows,decorations.pathreplacing}
 
+\usepackage{ifthen}
+
 \usepackage{upmath}
 \usepackage{upgreek}
 \usepackage{amsmath, amssymb}
@@ -20,6 +22,7 @@
 \newcommand{\bvec}[1]{\boldsymbol{#1}}
 \def\bx{\bvec{x}}
 \def\by{\bvec{y}}
+\newcommand{\ds}[1][]{\,\mathrm{d}s\ifthenelse{\equal{#1}{}}{}{(#1)}}
 
 \definecolor{bemppgrey}{HTML}{555555}
 \definecolor{bempporange}{HTML}{FF7A1A}
