@@ -49,9 +49,9 @@ In summary, to solve a boundary integral equation problem, the following steps a
 \begin{enumerate}
 	\item Import of the surface description as triangulation data.
 	\item Definition of the trial space, test space and range space.
-	\item Discretization into a matrix problem $Ax=b$.
+	\item Discretisation into a matrix problem $Ax=b$.
 	\item Solution of the matrix problem by either a direct or iterative solver.
-	\item Evaluation of domain potential operators for visualization and post-processing.
+	\item Evaluation of domain potential operators for visualisation and post-processing.
 \end{enumerate}
 
 All of these steps are accelerated through the use of either Numba or OpenCL. In the following section we provide a high-level overview of the library and how these acceleration techniques are deployed before we deep dive into the design of the computational kernels.
