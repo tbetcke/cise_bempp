@@ -2,12 +2,43 @@
 
 \usepackage[colorlinks,urlcolor=blue,linkcolor=blue,citecolor=blue]{hyperref}
 
+\usepackage{xcolor}
+\definecolor{bemppgrey}{HTML}{555555}
+\definecolor{bempporange}{HTML}{FF7A1A}
+
+\usepackage{biblatex}
+
+\usepackage{pythonhighlight}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,decorations.pathreplacing}
+
+\usepackage{ifthen}
+
 \usepackage{upmath}
+\usepackage{upgreek}
 \usepackage{amsmath, amssymb}
 
-\def\bx{\mathbf{x}}
-\def\by{\mathbf{y}}
+\usepackage{cleveref}
+\crefname{equation}{Equation}{Equations}
+\Crefname{equation}{Equation}{Equations}
+\crefname{figure}{Figure}{Figures}
+\Crefname{figure}{Figure}{Figures}
+\crefname{section}{Section}{Sections}
+\Crefname{section}{Section}{Sections}
 
+% Bold vector (for points in R^3)
+\newcommand{\bvec}[1]{\boldsymbol{#1}}
+\def\bx{\bvec{x}}
+\def\by{\bvec{y}}
+\newcommand{\ds}[1][]{\,\mathrm{d}s\ifthenelse{\equal{#1}{}}{}{_{#1}}}
+
+% Discrete vector and discrete matrix
+\newcommand{\dmat}[1]{\mathbf{#1}}
+\newcommand{\dvec}[1]{\mathbf{#1}}
+
+
+\addbibresource{references.bib}
 
 
 \jvol{XX}
@@ -15,7 +46,7 @@
 \paper{8}
 \jmonth{May/June}
 \jname{IT Professional}
-\pubyear{2019}
+\pubyear{2021}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 
@@ -46,6 +77,8 @@ The Bempp boundary element library is a well known library for the simulation of
 \input{bem}
 \input{bempp_overview}
 \input{opencl}
+
+\printbibliography
 
 \end{document}
 
