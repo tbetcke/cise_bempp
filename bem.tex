@@ -1,5 +1,5 @@
 \section{Boundary element methods with Bempp}
-In this section, we provide a brief introduction to boundary element methods and describe the necessary steps for their numerical discretisation and solution.
+In this section, we provide a brief introduction to boundary element methods and describe the necessary steps for their numerical discretization and solution.
 
 The most simple boundary integral equation is of the form
 \begin{align}
@@ -8,22 +8,22 @@ The most simple boundary integral equation is of the form
 \end{align}
 The function $g(\bx, \by)$ is a Green's function, $f$ is a given right-hand side, and $\phi$ is an unknown surface density over the boundary $\Gamma$ of a bounded three dimensional domain $\Omega\subset\mathbb{R}^3$.
 
-As a concrete example, we consider computing the electrostatic capacity of an object $\Omega$. In this case, we solve the above equation with $f(\bx)=1$ and $g(\bx,\by)=\frac{1}{4\uppi|\bx - \by|}$. Once $\phi$ has been found, the normalised capacity is then obtained using $c = \frac{1}{4\uppi}\int_{\Gamma}\phi(\bx)\ds[\bx]$.
+As a concrete example, we consider computing the electrostatic capacity of an object $\Omega$. In this case, we solve the above equation with $f(\bx)=1$ and $g(\bx,\by)=\frac{1}{4\uppi|\bx - \by|}$. Once $\phi$ has been found, the normalized capacity is then obtained using $c = \frac{1}{4\uppi}\int_{\Gamma}\phi(\bx)\ds[\bx]$.
 
 Many practical problems have a significantly more complex structure and can involve block systems of integral equations. Nevertheless, the fundamental structure of what Bempp-cl does is well described by the above problem and will be described in the following.
 
 \begin{figure}
   \centering
   \input{img/sphere}
-  \caption{Discretisation of a sphere into flat surface triangles.}
+  \caption{Discretization of a sphere into flat surface triangles.}
   \label{fig:triangulation}
 \end{figure}
 
-The first step is the \textbf{discretisation of the surface} $\Gamma$. Surfaces are represented in Bempp-cl as a triangulation into flat triangles (see \cref{fig:triangulation}). The triangulation is internally represented as an array of node coordinates and an associated connectivity array of node indices that define each triangle. In this step, topology data is also computed: in particular, for each triangle, we compute the neighboring triangles and the type of intersection (i.e. are they connected by an edge or a vertex).
+The first step is the \textbf{discretization of the surface} $\Gamma$. Surfaces are represented in Bempp-cl as a triangulation into flat triangles (see \cref{fig:triangulation}). The triangulation is internally represented as an array of node coordinates and an associated connectivity array of node indices that define each triangle. In this step, topology data is also computed: in particular, for each triangle, we compute the neighboring triangles and the type of intersection (i.e. are they connected by an edge or a vertex).
 
-Once a triangulation is given we need to define the necessary data structures for the discretisation. Bempp-cl uses a Galerkin discretisation: we introduce set of basis functions \(\phi_1\) to \(\phi_N\), and define the \textbf{trial space} as the span of these function. We then approximate the solution \(\phi\) of \cref{eq:bnd_integral} by $\phi_h=\sum_{j=1}^N \dvec{x}_j\phi_j$, where $\dvec{x}$ is a vector of coefficients. In the most simple case, we can define the function \(\phi_j\) to be equal to 1 on the triangle $\tau_j$ and 0 everywhere else. Other spaces are commonly defined to be piecewise polynomials on each triangle.
+Once a triangulation is given we need to define the necessary data structures for the discretization. Bempp-cl uses a Galerkin discretization: we introduce set of basis functions \(\phi_1\) to \(\phi_N\), and define the \textbf{trial space} as the span of these function. We then approximate the solution \(\phi\) of \cref{eq:bnd_integral} by $\phi_h=\sum_{j=1}^N \dvec{x}_j\phi_j$, where $\dvec{x}$ is a vector of coefficients. In the most simple case, we can define the function \(\phi_j\) to be equal to 1 on the triangle $\tau_j$ and 0 everywhere else. Other spaces are commonly defined to be piecewise polynomials on each triangle.
 
-To discretise \cref{eq:bnd_integral}, we define a \textbf{test (or dual) space} in terms of a basis \(\psi_1\) to \(\psi_N\). The discrete representation of the above problem then takes the form
+To discretize \cref{eq:bnd_integral}, we define a \textbf{test (or dual) space} in terms of a basis \(\psi_1\) to \(\psi_N\). The discrete representation of the above problem then takes the form
 $$
 \dmat{A}\dvec{x} = \dvec{b}
 $$
@@ -43,15 +43,15 @@ Once the grid, the space objects, and the operator(s) are defined, the main comp
 
 The values $\dvec{b}_i$ of the right-hand side vector $b$ are similarly computed through a numerical quadrature rule.
 
-In the final step, \textbf{Bempp solves the underlying linear system of equations} either through a direct LU decomposition or through iterative solvers such as GMRES. The solution can then be evaluated away from the surface $\Gamma$ through domain potential operators and exported in various formats for visualisation.
+In the final step, \textbf{Bempp solves the underlying linear system of equations} either through a direct LU decomposition or through iterative solvers such as GMRES. The solution can then be evaluated away from the surface $\Gamma$ through domain potential operators and exported in various formats for visualization.
 
 In summary, to solve a boundary integral equation problem, the following steps are performed by Bempp:
 \begin{enumerate}
 	\item Import of the surface description as triangulation data.
 	\item Definition of the trial space, test space and range space.
-	\item Discretisation into a matrix problem $\dmat{A}\dvec{x}=\dvec{b}$.
+	\item Discretization into a matrix problem $\dmat{A}\dvec{x}=\dvec{b}$.
 	\item Solution of the matrix problem by either a direct or iterative solver.
-	\item Evaluation of domain potential operators for visualisation and post-processing.
+	\item Evaluation of domain potential operators for visualization and post-processing.
 \end{enumerate}
 
 All of these steps are accelerated through the use of either Numba or OpenCL. In the following section we provide a high-level overview of the library and how these acceleration techniques are deployed before we deep dive into the design of the computational kernels.

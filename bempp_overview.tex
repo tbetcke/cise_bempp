@@ -11,13 +11,13 @@ The main user-visible component of Bempp-cl is the module \pyth{bempp.api}, whic
 
 The main computational cost involved in solving a problem using boundary element methods is due to discretising the boundary integral operator on the left-hand side of \cref{eq:bnd_integral} to obtain the matrix $\dmat{A}$: using dense methods, discretising an operator has quadratic complexity in terms of the number of surface triangles (although for larger problems this cost can be reduced through the use of hierarchical matrices or fast multipole methods). Great care is therefore taken to ensure that the operator assembly routines perform as highly as possible.
 
-Once a user has defined in operator using Bempp-cl, the discretisation can be computed by calling the \pyth{weak_form} method. Upon calling this method, a regular integrator will be used to assemble all the interactions between non-adjacent elements, and a singular integrator will be used to compute the interactions between adjacent triangles (if the trial and test spaces are defined on different grids, this second integrator is not needed). Depending on the user's preferences, these integrators will internally use computational routines defined using either Numba or OpenCL.
+Once a user has defined in operator using Bempp-cl, the discretization can be computed by calling the \pyth{weak_form} method. Upon calling this method, a regular integrator will be used to assemble all the interactions between non-adjacent elements, and a singular integrator will be used to compute the interactions between adjacent triangles (if the trial and test spaces are defined on different grids, this second integrator is not needed). Depending on the user's preferences, these integrators will internally use computational routines defined using either Numba or OpenCL.
 
-For OpenCL assembly, the code checks additional parameters, such as the default vector length for SIMD operators (e.g., 4 for double precision and 8 for single precision in Intel AVX2, or 1 if a GPU is used), andwhether the discretisation should proceed in single or double precision. The OpenCL kernel is then compiled for the underlying compute device using PyOpenCL and executed. If the computational backend is Numba, the call is forwarded to the corresponding Numba discretisation routines and executed.
+For OpenCL assembly, the code checks additional parameters, such as the default vector length for SIMD operators (e.g., 4 for double precision and 8 for single precision in Intel AVX2, or 1 if a GPU is used), andwhether the discretization should proceed in single or double precision. The OpenCL kernel is then compiled for the underlying compute device using PyOpenCL and executed. If the computational backend is Numba, the call is forwarded to the corresponding Numba discretization routines and executed.
 
-For simple piecewise constant function spaces or other spaces, where the support of each basis function is localised to a single triangle, only one call to the computational routines is necessary. If the support of basis functions is larger than a single triangle, different threads may need to sum into the same global degree of freedom. We discuss this in more detail in \cref{sec:coloring}.
+For simple piecewise constant function spaces or other spaces, where the support of each basis function is localized to a single triangle, only one call to the computational routines is necessary. If the support of basis functions is larger than a single triangle, different threads may need to sum into the same global degree of freedom. We discuss this in more detail in \cref{sec:coloring}.
 
-Outside the operator discretisation, Numba is used in the following contexts:
+Outside the operator discretization, Numba is used in the following contexts:
 \begin{itemize}
   \item Computing the grid topology: this involves iterating through the grid to compute the neighbour relataionships between triangles.
   \item Definition of local-to-global maps for function spaces: again, this requires traversal through the grid and assigning relationships between global and local indices.
@@ -25,4 +25,4 @@ Outside the operator discretisation, Numba is used in the following contexts:
   \item Computing sparse matrices.
 \end{itemize}
 
-As the cost of each of these processes is in general much smaller than the cost of operator discretisation, these can be permformed using Numba without any need to consider the use of OpenCL for potential further speed up.
+As the cost of each of these processes is in general much smaller than the cost of operator discretization, these can be permformed using Numba without any need to consider the use of OpenCL for potential further speed up.
