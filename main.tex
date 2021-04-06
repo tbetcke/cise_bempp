@@ -2,12 +2,21 @@
 
 \usepackage[colorlinks,urlcolor=blue,linkcolor=blue,citecolor=blue]{hyperref}
 
+\usepackage{biblatex}
 \usepackage{upmath}
+\usepackage{upgreek}
 \usepackage{amsmath, amssymb}
 
-\def\bx{\mathbf{x}}
-\def\by{\mathbf{y}}
+\usepackage{cleveref}
+\crefname{equation}{}{}
+\crefname{figure}{figure}{figures}
+\Crefname{figure}{Figure}{Figures}
 
+\newcommand{\bvec}[1]{\boldsymbol{#1}}
+\def\bx{\bvec{x}}
+\def\by{\bvec{y}}
+
+\addbibresource{references.bib}
 
 
 \jvol{XX}
@@ -15,7 +24,7 @@
 \paper{8}
 \jmonth{May/June}
 \jname{IT Professional}
-\pubyear{2019}
+\pubyear{2021}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 
@@ -46,6 +55,8 @@ The Bempp boundary element library is a well known library for the simulation of
 \input{bem}
 \input{bempp_overview}
 \input{opencl}
+
+\printbibliography
 
 \end{document}
 
