@@ -10,17 +10,11 @@ OpenCL (\url{https://www.khronos.org/opencl/}) is a heterogeneous compute standa
 
 OpenCL splits computational tasks into work-items, each of which represents a single execution of a compute kernel. Work items are grouped together into work groups, which share local memory. Barrier synchronization is only allowed within a work group. All work items are uniquely indexed by a one, two, or three dimensional index space, called NDRange. Kernels are launched onto a compute device (e.g., a CPU or GPU) from a host device. OpenCL allows kernels to be loaded as strings and compiled on the fly for a given device, making it well suited for launching from high-productivity languages.
 
-To launch an OpenCL kernel the following steps need to be performed:
-\begin{itemize}
-	\item Initialize buffers on the compute device.
-	\item Compute relevant data from host to the compute device.
-	\item Load a kernel string and just-in-time compile it for the device.
-	\item Execute the kernel for the given buffers and chosen index space.
-	\item Copy results back to the host.
-\end{itemize}
-An excellent feature of OpenCL is its very good support for vectorized operations. OpenCL provides vector data types, such as \textbf{double4}, that can hold four double values in a SIMD register and defines a number of standard operations for these vector types. This makes it easy to explicitly target modern SIMD execution in a portable way while avoiding difficult compiler intrinsics and keeping kernel code readable.
+To launch an OpenCL kernel the user must first initialize buffers on the compute device, then copy any relevant data from host to the compute device. A kernel string can then be loaded and just-in-time compiled for the device. The kernel is then run, and the results can be copied back to the host.
 
-Python has excellent OpenCL support through the PyOpenCL library by Andreas Kloeckner, which automates much of the initialization of the OpenCL environment and makes it easy to create buffers and launch OpenCL kernels from Python.
+OpenCL has very good support for vectorized operations: it provides vector data types and defines a number of standard operations for these vector types. For example, the type \ocl{double4} will allow four double values to be held in a SIMD register. This makes it easy to explicitly target modern SIMD execution in a portable way while avoiding difficult compiler intrinsics and keeping kernel code readable.
+
+Python has excellent OpenCL support through the PyOpenCL library by Andreas Kloeckner \cite{pyopencl}. PyOpenCL automates much of the initialization of the OpenCL environment and makes it easy to create buffers and launch OpenCL kernels from Python.
 
 \subsection{OpenCL Assembly in Bempp-cl}
 
@@ -31,8 +25,7 @@ Python has excellent OpenCL support through the PyOpenCL library by Andreas Kloe
 	\label{fig:kernel_definition}
 \end{figure*}
 
-
-Bempp-cl has OpenCL kernels for all its boundary operators. All operators have the same interface and are launched in the same way. In the first step the relevant data will need to be copied to the compute device. This data consists of:
+Bempp-cl has OpenCL kernels for all its boundary operators. All operators have the same interface and are launched in the same way. In the first step, the relevant data will need to be copied to the compute device. This data consists of:
 
 \begin{itemize}
 	\item Test and trial indices of triangles over which to be integrated.
@@ -47,7 +40,7 @@ Bempp-cl has OpenCL kernels for all its boundary operators. All operators have t
 	\item Number of test and trial degrees of freedom.
 	\item A single byte that is set to one if the test and trial grids are disjoint.
 \end{itemize}
-The actual kernel definition is shown in Figure \ref{fig:kernel_definition}.
+The actual kernel definition is shown in \cref{fig:kernel_definition}.
 Before the kernel can be launched, it needs to be configured and just-in-time compiled. Kernel configuration happens through C-style preprocessor definitions that are passed through the just-in-time compiler. These include the names of the test and trial space, the name of the function that evaluates the integral kernel, choosing between single and double precision types, and for SIMD enhanced kernel the vector length of the SIMD types.
 For example, in Figure \ref{fig:kernel_definition} all floating point types have the name \ocl{REALTYPE}. This is substituted with either \textit{float} or \textit{double} during just-in-time compilation.
 
