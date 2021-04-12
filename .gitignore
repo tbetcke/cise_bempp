@@ -286,4 +286,6 @@ TSWLatexianTemp*
 # Texstudio file
 *.txss
 
+# 
+**/.ipynb_checkpoints/*
 
