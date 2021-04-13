@@ -19,7 +19,14 @@ Many practical problems have a significantly more complex structure and can invo
   \label{fig:triangulation}
 \end{figure}
 
-The first step is the \textbf{discretization of the surface} $\Gamma$. Surfaces are represented in Bempp-cl as a triangulation into flat triangles (see \cref{fig:triangulation}). The triangulation is internally represented as an array of node coordinates and an associated connectivity array of node indices that define each triangle. In this step, topology data is also computed: in particular, for each triangle, we compute the neighboring triangles and the type of intersection (i.e. are they connected by an edge or a vertex).
+\begin{figure*}
+  \centering
+  \input{img/triangles}
+  \caption{The four types of intersection of two triangles: the triangles can be (L to R) not neighbours, neighbours adjacent via a vertex, neighbours adjacent via an edge, or the same triangle. In the first case, standard quadrature is used. In the other three cases, singular quadrature rules must be used.}
+  \label{fig:triangles}
+\end{figure*}
+
+The first step is the \textbf{discretization of the surface} $\Gamma$. Surfaces are represented in Bempp-cl as a triangulation into flat triangles (see \cref{fig:triangulation}). The triangulation is internally represented as an array of node coordinates and an associated connectivity array of node indices that define each triangle. In this step, topology data is also computed: in particular, for each triangle, we compute the neighboring triangles and the type of intersection (i.e. are they connected by an edge or a vertex, see \cref{fig:triangles}).
 
 Once a triangulation is given we need to define the necessary data structures for the discretization. Bempp-cl uses a Galerkin discretization: we introduce set of basis functions \(\phi_1\) to \(\phi_N\), and define the \textbf{trial space} as the span of these function. We then approximate the solution \(\phi\) of \cref{eq:bnd_integral} by $\phi_h=\sum_{j=1}^N \dvec{x}_j\phi_j$, where $\dvec{x}$ is a vector of coefficients. In the most simple case, we can define the function \(\phi_j\) to be equal to 1 on the triangle $\tau_j$ and 0 everywhere else. Other spaces are commonly defined to be piecewise polynomials on each triangle.
 
