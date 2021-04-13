@@ -64,3 +64,5 @@ The assembly of the singular part of an integral operator works a bit differentl
 
 \subsection{Avoiding data races in the global assembly}
 
+Data races in global assembly routines are a problem whenever different elements need to sum into the same global degree of freedom. To solve this we use standard color coding techniques to split up the computations into chunks that access different data regions. To this end, we define two elements as neighbors if they share at least one global degree of freedom. Based on this relationship we run a simple greedy coloring algorithm in the initialization phase of a function space. This information is then later used to run the compute kernels color by color. OpenCL parallelises over test elements and trial elements. Here we therefore have to iterate over the product space of possible color combinations. In Numba we only parallelise over test elements. Here it is sufficient to iterate over all possible colors in the test space.
+
