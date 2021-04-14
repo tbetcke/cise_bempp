@@ -46,13 +46,13 @@ the definition of the trial and test spaces, and the definition of the range spa
 products and not relevant for the purpose of this paper. The function $f$ is represented as a \textbf{grid function} object, which
 consists of either the dual representation in the forms of the integrals $\dvec{b}_i = \int_{\Gamma}\psi_i(\bx)f(\bx)\ds[\bx]$ or directly through its coefficients $f_j$ in the representation $f=\sum_{j=1}^N f_j\phi_j$.
 
-Once the grid, the space objects, and the operator(s) are defined, the main computational step is performed, namely the \textbf{computation of the discrete matrix entries} $\dmat{A}_{ij}$. For pairs of triangles $\tau_i$ and $\tau_j$ that do not share a joint edge or vertex this is done through a simple numerical quadrature rule that approximates $\dmat{A}_{ij}\approx \sum_{\ell}\sum_{q} g(\bx_\ell, \by_q)\psi_i(\bx_\ell)\phi_j(\by_q)\omega_\ell\omega_q$, where the $\bx_\ell$ and $\by_q$ are quadrature points in the corresponding triangles $\tau_i$ and $\tau_j$, and the values $\omega_i$ and $\omega_j$ are the quadrature weights. In the case that two triangles share a joint vertex/edge or the triangles $\tau_i$ and $\tau_j$ are identical, corresponding singularity adapted quadrature numerical quadrature rules are used that are based on singularity removing coordinate transformations.
+Once the grid, the space objects, and the operator(s) are defined, the main computational step is performed, namely the \textbf{computation of the discrete matrix entries} $\dmat{A}_{ij}$. For pairs of triangles $\tau_i$ and $\tau_j$ that do not share a joint edge or vertex this is done through a simple numerical quadrature rule that approximates $\dmat{A}_{ij}\approx \sum_{\ell}\sum_{q} g(\bx_\ell, \by_q)\psi_i(\bx_\ell)\phi_j(\by_q)\omega_\ell\omega_q$, where the $\bx_\ell$ and $\by_q$ are quadrature points in the corresponding triangles $\tau_i$ and $\tau_j$, and the values $\omega_\ell$ and $\omega_q$ are the quadrature weights. In the case that two triangles share a joint vertex/edge or the triangles $\tau_i$ and $\tau_j$ are identical (see Figure \ref{fig:triangles}), corresponding singularity adapted quadrature numerical quadrature rules are used that are based on singularity removing coordinate transformations.
 
-The values $\dvec{b}_i$ of the right-hand side vector $b$ are similarly computed through a numerical quadrature rule.
+The values $\dvec{b}_i$ of the right-hand side vector $\dvec{b}$ are similarly computed through a numerical quadrature rule.
 
-In the final step, \textbf{Bempp solves the underlying linear system of equations} either through a direct LU decomposition or through iterative solvers such as GMRES. The solution can then be evaluated away from the surface $\Gamma$ through domain potential operators and exported in various formats for visualization.
+In the final step, \textbf{Bempp-cl solves the underlying linear system of equations} either through a direct LU decomposition or through iterative solvers. The solution can then be evaluated away from the surface $\Gamma$ through domain potential operators and exported in various formats for visualization.
 
-In summary, to solve a boundary integral equation problem, the following steps are performed by Bempp:
+In summary, to solve a boundary integral equation problem, the following steps are performed by Bempp-cl:
 \begin{enumerate}
 	\item Import of the surface description as triangulation data.
 	\item Definition of the trial space, test space and range space.
