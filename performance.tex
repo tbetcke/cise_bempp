@@ -1,7 +1,7 @@
 \section{PERFORMANCE BENCHMARKS}
 
 In this section, we provide a number of performance benchmarks. The tests are running on a Dell Precision 7740 Workstation Laptop with 64 GB RAM. Its CPU is an Intel i9-9980HK with a base clock of 2.4GHz and a burst clock of 5GHz. The CPU supports AVX, AVX2, and AVX-512.
-As a GPU we use an Nvidia RTX 3000 GPU. All benchmark tests were performed in Linux. For OpenCL on the GPU, we use the Nvidia GPU drivers and as CPU runtime we compare the open-source PoCL driver against the Intel CPU OpenCL runtime environment. All timing runs were repeated several times to make sure that the overhead from running the OpenCL and Numba JIT compilers did not skew the results. Though hardly noticeable by users, for smaller experiments the JIT phase typically takes longer than the actual computation.
+As a GPU we use an Nvidia Quadro RTX 3000 GPU. All benchmark tests were performed in Linux. For OpenCL on the GPU, we use the Nvidia GPU drivers and as CPU runtime we compare the open-source PoCL driver against the Intel CPU OpenCL runtime environment. All timing runs were repeated several times to make sure that the overhead from running the OpenCL and Numba JIT compilers did not skew the results. Though hardly noticeable by users, for smaller experiments the JIT phase typically takes longer than the actual computation.
 
 \subsection{Dense Operator assembly}
 We start by benchmarking the dense operator assembly. We assemble the matrix $\dmat{A}$ defined by
@@ -19,7 +19,7 @@ We first compare the OpenCL CPU performance for the Intel OpenCL runtime, and th
 	\label{fig:intel_pocl_laplace_cmp}
 \end{figure}
 
-The timings for a grid with 32,768 elements are shown in \cref{fig:intel_pocl_laplace_cmp}. We see the expected speed-up between single precision and double precision evaluation. It is interesting to note the difference between the Intel and the PoCL runtime environment. For P0 basis functions, the PoCL driver (gray bar) significantly outperforms the Intel driver (orange bar) in both single and double precision. For P1 basis functions, however, the Intel driver gives better performance. The kernel source code is the same in both cases and manual vectorization of floating point operations is performed in the same way. In the P1 case, significantly more data needs to be copied between a work-item and the global memory since the result of the interaction of a test triangle with a trial triangle is a local $3\times 3$ matrix containing all interactions between the three test basis functions on a triangle and the three trial basis functions. {\color{red}(?)}
+The timings for a grid with 32,768 elements are shown in \cref{fig:intel_pocl_laplace_cmp}. We see the expected speed-up between single precision and double precision evaluation. It is interesting to note the difference between the Intel and the PoCL runtime environment. For P0 basis functions, the PoCL driver (gray bar) significantly outperforms the Intel driver (orange bar) in both single and double precision. For P1 basis functions, however, the Intel driver gives better performance.
 
 In \cref{fig:pocl_single_layer}, we compare specifically the performance of single precision and double precision evaluation for the PoCL driver for various grid sizes in the case of a P0 basis. We can see that the speed-up for larger grid sizes is slightly more than just a factor of two. The final data point in this graph corresponds to the grid size used for \cref{fig:intel_pocl_laplace_cmp}.
 
@@ -67,9 +67,9 @@ In this section, we consider the evaluation of the electric potential operator, 
 \end{multline}
 where $g(\bx, \by) = \frac{\ee^{\ii k|\bx - \by|}}{4\pi|\bx - \by|}$ is the Helmholtz Green's function, and
 $k$ the wavenumber of the problem.
-The function $\mathbf{p}:\mathbb{R}^3\to\mathbb{R}^3$ is a vector-valued function, leading to an overall vector solution at each point $\bx$. The implementation of electromagnetic problems in Bempp is covered in detail in \cite{bempp_maxwell}. For these experiments, we again use a grid with 32,768 elements and RWG (Rao, Wilton, and Glisson) edge-based basis functions. For the potential evaluation, we use 50,000 random evaluation points in the exterior of the unit sphere. We set $k=1.0$, although the wavenumber have little to no effect on the performance. {\color{red}[If $k$ is very high, surely it becomes relevant?]}
+The function $\mathbf{p}:\mathbb{R}^3\to\mathbb{R}^3$ is a vector-valued function, leading to an overall vector solution at each point $\bx$. The implementation of electromagnetic problems in Bempp is covered in detail in \cite{bempp_maxwell}. For these experiments, we again use a grid with 32,768 elements and RWG (Rao, Wilton, and Glisson) edge-based basis functions. For the potential evaluation, we use 50,000 random evaluation points in the exterior of the unit sphere, and as wavenumber use $k=1.0$.
 
-In \cref{fig:efield_domain_potential}, we compare the performance of GPU evaluation with that of the PoCL CPU driver. In single-precision, the GPU significantly outperforms the CPU; and even in double-precision, the Quadro {\color{red}[Quadro? Nvidia?]} RTX GPU is faster than the 8-core CPU, even though its hardware is not optimised for fast double-precision operations.
+In \cref{fig:efield_domain_potential}, we compare the performance of GPU evaluation with that of the PoCL CPU driver. In single-precision, the GPU significantly outperforms the CPU; and even in double-precision, the Nvidia Quadro RTX GPU is faster than the 8-core CPU, even though its hardware is not optimised for fast double-precision operations.
 
 \begin{figure}
 	\center
