@@ -1,5 +1,5 @@
 \section{BOUNDARY ELEMENT METHODS WITH BEMPP}
-In this section, we provide a brief introduction to boundary element methods and describe the necessary steps for their numerical discretization and solution.
+In this section, we provide a brief introduction to boundary element methods (BEM) and describe the necessary steps for their numerical discretization and solution.
 
 The most simple boundary integral equation is of the form
 \begin{align}
@@ -10,7 +10,7 @@ The function $g(\bx, \by)$ is a Green's function, $f$ is a given right-hand side
 
 As a concrete example, we consider computing the electrostatic capacity of an object $\Omega$. In this case, we solve the above equation with $f(\bx)=1$ and $g(\bx,\by)=\frac{1}{4\uppi|\bx - \by|}$. Once $\phi$ has been found, the normalized capacity is then obtained using $c = \frac{1}{4\uppi}\int_{\Gamma}\phi(\bx)\ds[\bx]$.
 
-Many practical problems have a significantly more complex structure and can involve block systems of integral equations. Nevertheless, the fundamental structure of what Bempp-cl does is well described by the above problem and will be described in the following.
+Many practical problems have a significantly more complex structure and can involve block systems of integral equations or even coupling with finite element (FEM) codes. Nevertheless, the fundamental structure of what Bempp-cl does is well described using the above simple problem.
 
 \begin{figure}
   \centering
