@@ -1,6 +1,6 @@
 \section{PERFORMANCE BENCHMARKS}
 
-In this section, we provide a number of performance benchmarks. The tests are running on a Dell Precision 7740 Workstation Laptop with 64 GB RAM. Its CPU is an Intel i9-9980HK with a base clock of 2.4GHz and a burst clock of 5GHz. The CPU supports AVX, AVX2, and AVX-512.
+In this section, we provide a number of performance benchmarks. The tests were all run on a Dell Precision 7740 Workstation Laptop with 64 GB RAM. Its CPU is an Intel i9-9980HK with a base clock of 2.4GHz and a burst clock of 5GHz. The CPU supports AVX, AVX2, and AVX-512.
 As a GPU we use an Nvidia Quadro RTX 3000 GPU. All benchmark tests were performed in Linux. For OpenCL on the GPU, we use the Nvidia GPU drivers and as CPU runtime we compare the open-source PoCL driver against the Intel CPU OpenCL runtime environment. All timing runs were repeated several times to make sure that the overhead from running the OpenCL and Numba just-in-time compilers did not skew the results. Though hardly noticeable by users, for smaller experiments the compilation phase typically takes longer than the actual computation.
 
 \subsection{Dense Operator assembly}
@@ -10,7 +10,7 @@ $$
 $$
 with $\Gamma$ being the unit sphere. For the basis functions $\phi_j$ and test functions $\psi_i$, we compare two cases: piecewise constant functions for both (P0 functions); and nodal, piecewise linear, and globally continuous functions for both (P1 functions). In the P0 case, each triangle is associated with just one piecewise constant function. In the P1 case, each triangle is associated with $3$ linear basis functions, one for each node of the triangle.
 
-We first compare the OpenCL CPU performance for the Intel OpenCL runtime, and the PoCL OpenCL runtime driver. We run the tests in single precision and double precision. The native vector width for both drivers in single precision is $8$, and in double precision is $4$, corresponding to AVX instructions. In Bempp-cl, this means that we assemble in vectorized form one test triangle with $8$ trial triangles in single precision, and with $4$ trial triangles in double precision. Within the assembly, almost all floating point instructions are manually vectorized to take advantage of this. We should hence see up to a factor 2 speed-up between single and double precision assembly.
+We first compare the OpenCL CPU performance for the Intel OpenCL runtime and the PoCL OpenCL runtime driver. We run the tests in single precision and double precision. The native vector width for both drivers in single precision is $8$, and in double precision is $4$, corresponding to AVX instructions. In Bempp-cl, this means that we assemble in vectorized form one test triangle with $8$ trial triangles in single precision, and with $4$ trial triangles in double precision. Within the assembly, almost all floating point instructions are manually vectorized to take advantage of this. We should hence see up to a factor 2 speed-up between single and double precision assembly.
 
 \begin{figure}
 	\center
@@ -40,7 +40,7 @@ In \cref{fig:pocl_single_layer}, we compare specifically the performance of sing
 	 GPU    &   0.11s       &    3.00s\\
 \end{tabular}
 \end{center}
-\caption{Comparison of PoCL, Numba and GPU Assembly for a grid with 2048 elements.}
+\caption{Comparison of PoCL, Numba and GPU assembly for a grid with 2048 elements.}
 \label{fig:cpu_gpu_numba_compare}
 \end{figure}
 In Bempp-cl, we can easily switch between CPU Assembly, GPU Assembly, and Numba Assembly. \Cref{fig:cpu_gpu_numba_compare} shows a comparison between these modes for a grid with 2048 elements. The speed differences are striking. GPU assembly in single precision is a factor of two slower than CPU assembly (and much slower in double precision due to Nvidia hardware restrictions for double precision). Numba is five times slower for single precision and still around three times slower for double precision than PoCL. The GPU behaviour can be explained by data transfer: while the GPU kernels themselves are extremely fast, data transfer over the bus severely limits performance. Even for medium sized problems, we have to transfer the data back to the main memory as GPU RAM is too limited to keep dense matrices with tens of thousands of rows and columns on the device.
@@ -65,23 +65,23 @@ In this section, we consider the evaluation of the electric potential operator, 
 \left(\mathcal{E}\mathbf{p}\right)(\bx) = \ii k\int_{\Gamma}\mathbf{p}(\by)g(\bx, \by) \ds[\by]\\
 -\frac{1}{\ii k}\nabla_{\bx}\int_{\Gamma}\operatorname{div}\mathbf{p}(\by)g(\bx, \by)\ds[\by],
 \end{multline}
-where $g(\bx, \by) = \frac{\ee^{\ii k|\bx - \by|}}{4\pi|\bx - \by|}$ is the Helmholtz Green's function, and
+where $g(\bx, \by) = \frac{\ee^{\ii k|\bx - \by|}}{4\uppi|\bx - \by|}$ is the Helmholtz Green's function, and
 $k$ the wavenumber of the problem.
-The function $\mathbf{p}:\mathbb{R}^3\to\mathbb{R}^3$ is a vector-valued function, leading to an overall vector solution at each point $\bx$. The implementation of electromagnetic problems in Bempp is covered in detail in \cite{bempp_maxwell}. For these experiments, we again use a grid with 32,768 triangles but this time RWG (Rao, Wilton, and Glisson) edge-based basis functions. For the potential evaluation, we use 50,000 random evaluation points in the exterior of the unit sphere, and as wavenumber use $k=1.0$.
+The function $\mathbf{p}:\mathbb{R}^3\to\mathbb{R}^3$ is a vector-valued function, leading to an overall vector solution at each point $\bx$. The implementation of electromagnetic problems in Bempp is covered in detail in \cite{bempp_maxwell}. For these experiments, we again use a grid with 32,768 triangles but this time RWG (Rao--Wilton--Glisson) edge-based basis functions are used. For the potential evaluation, we use 50,000 random evaluation points in the exterior of the unit sphere, and as wavenumber use $k=1.0$.
 
 In \cref{fig:efield_domain_potential}, we compare the performance of GPU evaluation with that of the PoCL CPU driver. In single-precision, the GPU significantly outperforms the CPU; and even in double-precision, the Nvidia Quadro RTX GPU is faster than the 8-core CPU, even though its hardware is not optimised for fast double precision operations.
 
 \begin{figure}
 	\center
 	\includegraphics[width=7cm]{img/efield_domain_potential.pdf}
-	\caption{Evaluation of an electric field potential operator on CPU via PoCL vs GPU}
+	\caption{Evaluation of an electric field potential operator on CPU via PoCL vs Nvidia GPU}
 	\label{fig:efield_domain_potential}
 \end{figure}
 
 \section{SUMMARY}
-With Bempp-cl, we have created a Python library that achieves high-performance through use of modern just-in-time compilation technologies. Bempp-cl mixes Numba evaluation for less compute intensive linear complexity loops and sparse matrix generation with highly optimized OpenCL kernels for computationally sensitive dense matrix assembly routines. Basing development on Python instead of classical C/C++ makes it very easy to adapt the library and integrate with other libraries with Python interfaces, such as the recent work integrating Bempp-cl and the Exafmm library to build electrostatic virus-scale simulations \cite{bempp_exafmm}.
+With Bempp-cl, we have created a Python library that achieves high-performance through use of modern just-in-time compilation technologies. Bempp-cl mixes Numba evaluation for less compute intensive linear complexity loops and sparse matrix generation with highly optimized OpenCL kernels for computationally sensitive dense matrix assembly routines. Basing development on Python instead of classical C/C++ makes it very easy to adapt the library and integrate with other libraries with Python interfaces, such as the recent work integrating Bempp-cl and the ExaFMM library to build electrostatic virus-scale simulations \cite{bempp_exafmm}.
 
-Strict separation of the computational backend from the interface layer in the library also makes it easy to integrate further backends, allowing us to remain up to date with future compute models. OpenCL itself has proved a valuable choice for the purpose of this library, as it allows us to run CPU and GPU optimized kernels with very little code overhead, and allows the user to easily move between CPU and GPU based compute devices with a simple parameter change. In this article, we demonstrate Nvidia benchmarks, the same benchmarking code could be used to run on AMD or Intel GPUs.
+Strict separation of the computational backend from the interface layer in the library also makes it easy to integrate further backends, allowing us to remain up to date with future compute models. OpenCL itself has proved a valuable choice for the purpose of this library, as it allows us to run CPU and GPU optimized kernels with very little code overhead, and allows the user to easily move between CPU- and GPU-based compute devices with a simple parameter change. In this article, we demonstrate Nvidia benchmarks: the same benchmarking code could be used to run on AMD or Intel GPUs.
 
 A disadvantage of our approach is that using OpenCL kernels introduce a second language (C99) to the library. Using Numba throughout would give a much more native Python experience, but, while Numba is constantly improving, it is currently difficult to achieve optimal performance for complex operations. OpenCL really shines here, as it makes explicit SIMD operations very easy through dedicated constructs. Moreoever, OpenCL kernels are completely stack based functions, allowing much better compiler optimisations while Numba needs to create every object dynamically, even very small arrays for objects such as coordinate vectors.
 
@@ -89,7 +89,7 @@ Additionally, one has to consider the type of operations that need to be acceler
 
 Overall, with the model of mixed Python/OpenCL/Numba development, we have created a flexible and easy to extend platform for integral equation computations. The initial re-implementation efforts by abandoning our old C++ code base are paying off, as they allow us to develop new features in a far simpler environment without sacrificing performance. Strict separation of compute backends and higher level routines makes it easy for us to integrate other accelerator techniques in the future with little code changes, and to react to new trends in heterogeneous computing.
 
-The current focus of further developments is on letting Bempp-cl take advantage of cluster computing by integrating the \pyth{mpi4py} MPI bindings for Python. We have also made big steps forward for large problems by creating a black-box FMM interface that currently intenfaces to Exafmm: this has allowed us to solve problems with 10 million elements on a single workstation. We believe that Python-focused development (with some native routines in lower-level languages) is a scalable model and are aiming to exploit this scalability further as we move from single workstation computations to large cluster problems.
+The current focus of further developments is on letting Bempp-cl take advantage of cluster computing by integrating the \pyth{mpi4py} MPI bindings for Python. We have also made big steps forward for large problems by creating a black-box FMM interface that currently interfaces to ExaFMM: this has allowed us to solve problems with 10 million elements on a single workstation. We believe that Python-focused development (with some native routines in lower-level languages) is a scalable model and are aiming to exploit this scalability further as we move from single workstation computations to large cluster problems.
 
 \section{Acknowledgements}
 The work of Timo Betcke is supported by Engineering and Physical Sciences Research Council Grant EP/V001531/1.

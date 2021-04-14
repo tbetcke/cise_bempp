@@ -8,11 +8,11 @@ dive into how we use OpenCL as part of Bempp-cl.
 
 OpenCL \cite{opencl} is a heterogeneous compute standard for CPUs, GPUs, FPGAs, and other types of devices that provide conformant drivers. At its core, OpenCL executes compute kernels that can be written in C99, or (more recently) in C++, with some restrictions on the allowed operations. The current version of OpenCL is 3.0, though the most widely implemented standard is OpenCL 1.2, which Bempp-cl uses.
 
-OpenCL splits computational tasks into work-items, each of which represents a single execution of a compute kernel. Work-items are grouped together into work-groups, which share local memory. Barrier synchronization is only allowed within a work-group. All work items are uniquely indexed by a one, two, or three dimensional index space, called NDRange. Kernels are launched onto a compute device (e.g., a CPU or GPU) from a host device. OpenCL allows kernels to be loaded as strings and compiled on-the-fly for a given device, making it well suited for launching from high-productivity languages.
+OpenCL splits computational tasks into work-items, each of which represents a single execution of a compute kernel. Work-items are grouped together into work-groups, which share local memory. Barrier synchronization is only allowed within a work-group. All work-items are uniquely indexed by a one, two, or three dimensional index space, called \ocl{NDRange}. Kernels are launched onto a compute device (e.g., a CPU or GPU) from a host device. OpenCL allows kernels to be loaded as strings and compiled on-the-fly for a given device, making it well suited for launching from high-productivity languages.
 
 To launch an OpenCL kernel the user must provide relevant data as buffers, which are transferred from host to the corresponding compute device. A kernel string can then be loaded and just-in-time compiled for the device. The kernel is then run, and the results can be copied back to the host.
 
-OpenCL has very good support for vectorized operations: it provides vector data types and defines a number of standard operations for these vector types. For example, the type \ocl{double4} will allow four double values to be held in a SIMD register. This makes it easy to explicitly target modern SIMD execution in a portable way while avoiding difficult compiler intrinsics and keeping kernel code readable.
+OpenCL has very good support for vectorized operations: it provides vector data types and defines a number of standard operations for these vector types. For example, the type \mbox{\ocl{double4}} will allow four double values to be held in a SIMD register. This makes it easy to explicitly target modern SIMD execution in a portable way while avoiding difficult compiler intrinsics and keeping kernel code readable.
 
 Python has excellent OpenCL support through the PyOpenCL library by Andreas Kloeckner \cite{pyopencl}. PyOpenCL automates much of the initialization of the OpenCL environment and makes it easy to create buffers and launch OpenCL kernels from Python.
 
@@ -30,14 +30,14 @@ Bempp-cl has OpenCL kernels for all its boundary operators. All operators have t
 \begin{itemize}
 	\item Test and trial indices of triangles over which to be integrated.
 	\item Signs of the normal directions for the spaces.
-	\item Test and trial grid as flat floating point array, defining each triangle through nine floating point numbers, specifying the $(x, y, z)$ coordinates of each of the three nodes of a triangle.
+	\item Test and trial grids as flat floating point arrays, defining each triangle through nine floating point numbers, specifying the $(x, y, z)$ coordinates of each of the three nodes of a triangle.
 	\item Test and trial connectivity information that stores the indices of each node for each triangle.
 	\item Test and trial mappings of local triangle degrees of freedom to global degrees of freedom.
 	\item Test and trial basis function multipliers for each triangle.
 	\item Quadrature points and quadrature weights.
 	\item A buffer that contains the global assembled matrix.
 	\item Additional kernel parameters, such as the wavenumber for Helmholtz problems.
-	\item Number of test and trial degrees of freedom.
+	\item The number of test and trial degrees of freedom.
 	\item A single byte that is set to one if the test and trial grids are disjoint.
 \end{itemize}
 
@@ -48,11 +48,11 @@ For example, in \cref{fig:kernel_definition} all floating point types have the n
 Each work-item computes (using numerical quadrature) all interactions of basis functions on the trial element with basis functions on the test element. Before summing the result into the global result buffer, the kernel checks via the connectivity information if the test and trial triangles are adjacent or identical (see \cref{fig:triangles}). To do this, it simply checks if at at least one of the node indices of the test triangle is equal to one of the node indices of the trial triangle. If this is true and the grids are not disjoint, the result of the kernel is discarded and not summed back into the global result buffer: for these triangles, separate singular quadrature rules need to be used. The effect is that a few work-items do work that is discarded. However, in a grid with $N$ elements, the number of triangle pairs requiring a singular quadrature rule is $\mathcal{O}(N)$, while the total number of triangle interactions is $N^2$. Hence, only a tiny fraction of work-items are discarded.
 
 \subsection{SIMD optimized kernels}
-When we are running on a CPU and want to take advantage of available SIMD optimizations, we need to make a few modifications to our approach. The corresponding kernel works similarly to what is described above, but we compute a batch of interactions between one test triangle and $X$ trial triangles, where $X$ is either 4, 8, or 16 (depending on the number of available SIMD lanes). This strategy allows us to optimize almost all floating point operations within a kernel run for SIMD operation. If the number of trial elements is not divisible by 4, 8, or 16, then the few remaining trial elements are assembled with the standard-non vectorized kernel.
+When we are running on a CPU and want to take advantage of available SIMD optimizations, we need to make a few modifications to our approach. The corresponding kernel works similarly to what is described above, but we compute a batch of interactions between one test triangle and $X$ trial triangles, where $X$ is either 4, 8, or 16 (depending on the number of available SIMD lanes). This strategy allows us to optimize almost all floating point operations within a kernel run for SIMD operation. If the number of trial elements is not divisible by 4, 8, or 16, then the few remaining trial elements are assembled with the standard non-vectorized kernel.
 
 Each kernel definition is stored in two variants, one with the ending \texttt{\_novec.cl} and another one with the ending \texttt{\_vec.cl}. The vectorized variant is configured via preprocessor directives for the desired number of vector lanes. Having to develop two OpenCL kernel codes for each operator creates a certain amount of overhead, but once we have implemented the non-vectorized version then, with the help of preprocessor directives and a number of helper functions that do the actual implementation of operations depending on whether the kernel is vectorized or not, it is usually only a matter of an hour or two to convert the non-vectorized kernel into a vectorized version.
 
-Alternatively, some CPU OpenCL runtime environments can (optionally) try and auto-vectorize kernels by batching together work items on SIMD lanes, similar to what we do manually. In our experience, this works well for very simple kernels but often fails for more complex OpenCL kernels. This is why we decided to implement this strategy manually.
+Alternatively, some CPU OpenCL runtime environments can (optionally) try and auto-vectorize kernels by batching together work-items on SIMD lanes, similar to what we do manually. In our experience, this works well for very simple kernels but often fails for more complex OpenCL kernels. This is why we decided to implement this strategy manually.
 
 A completely different SIMD strategy could be taken by batching together quadrature evaluations within a single test/trial pair. There are two disadvantages to this approach: first, it only works well if the number of quadrature points is a multiple of the available SIMD lanes. Second, other operations such as the geometry calculations for each element then cannot be SIMD optimized as these are only performed once per test/trial pair.
 
