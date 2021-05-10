@@ -6,11 +6,11 @@ dive into how we use OpenCL as part of Bempp-cl.
 
 \subsection{What is OpenCL?}
 
-OpenCL \cite{opencl} is a heterogeneous compute standard for CPUs, GPUs, FPGAs, and other types of devices that provide conformant drivers. At its core, OpenCL executes compute kernels that can be written in C99, or (more recently) in C++, with some restrictions on the allowed operations. The current version of OpenCL is 3.0, though the most widely implemented standard is OpenCL 1.2, which Bempp-cl uses.
+OpenCL \cite{opencl} is a heterogeneous compute standard for CPUs, GPUs, FPGAs, and other types of devices that provide conformant drivers. At its core, OpenCL executes compute kernels that can be written in OpenCL C, which is based on C99, or (more recently) in C++, with some restrictions on the allowed operations. The current version of OpenCL is 3.0, though the most widely implemented standard is OpenCL 1.2, which Bempp-cl uses.
 
 OpenCL splits computational tasks into work-items, each of which represents a single execution of a compute kernel. Work-items are grouped together into work-groups, which share local memory. Barrier synchronization is only allowed within a work-group. All work-items are uniquely indexed by a one, two, or three dimensional index space, called \ocl{NDRange}. Kernels are launched onto a compute device (e.g., a CPU or GPU) from a host device. OpenCL allows kernels to be loaded as strings and compiled on-the-fly for a given device, making it well suited for launching from high-productivity languages.
 
-To launch an OpenCL kernel the user must provide relevant data as buffers, which are transferred from host to the corresponding compute device. A kernel string can then be loaded and just-in-time compiled for the device. The kernel is then run, and the results can be copied back to the host.
+To launch an OpenCL kernel the user must provide relevant data as buffers, which are transferred from the host to the corresponding compute device. A kernel string can then be loaded and just-in-time compiled for the device. The kernel is then run, and the results can be copied back to the host.
 
 OpenCL has very good support for vectorized operations: it provides vector data types and defines a number of standard operations for these vector types. For example, the type \mbox{\ocl{double4}} will allow four double values to be held in a SIMD register. This makes it easy to explicitly target modern SIMD execution in a portable way while avoiding difficult compiler intrinsics and keeping kernel code readable.
 
@@ -31,9 +31,9 @@ Bempp-cl has OpenCL kernels for all its boundary operators. All operators have t
 	\item Test and trial indices of triangles over which to be integrated.
 	\item Signs of the normal directions for the spaces.
 	\item Test and trial grids as flat floating point arrays, defining each triangle through nine floating point numbers, specifying the $(x, y, z)$ coordinates of each of the three nodes of a triangle.
-	\item Test and trial connectivity information that stores the indices of each node for each triangle.
+	\item Test and trial connectivity, which are lists of node indices that define the corresponding elements of the test and trial grid.
 	\item Test and trial mappings of local triangle degrees of freedom to global degrees of freedom.
-	\item Test and trial basis function multipliers for each triangle.
+	\item Test and trial basis function multipliers for each triangle, which are triangle dependent prefactors needed for certain function spaces (e.g. in electromagnetics).
 	\item Quadrature points and quadrature weights.
 	\item A buffer that contains the global assembled matrix.
 	\item Additional kernel parameters, such as the wavenumber for Helmholtz problems.
@@ -69,7 +69,7 @@ For this assembly, we create one work-group for each singular triangle pair. Ins
 \end{figure}
 
 \subsection{Avoiding data races in the global assembly}
-Data races in global assembly routines are a problem whenever different triangles need to sum into the same global degree of freedom. To solve this we use standard color coding techniques to split up the computations into chunks that access different data regions. To this end, we define two triangles as neighbors if they share at least one global degree of freedom. Based on this relationship we run a simple greedy coloring algorithm in the initialization phase of a function space. An example coloring is shown in \cref{fig:colouring}.
+Data races in global assembly routines are a problem whenever different triangles need to sum into the same global degree of freedom. To solve this we use standard colouring techniques to split up the computations into chunks that access different data regions. To this end, we define two triangles as neighbours if they share at least one global degree of freedom. Based on this relationship we run a simple greedy colouring algorithm in the initialization phase of a function space. An example colouring is shown in \cref{fig:colouring}.
 
-The compute kernels can then be run color-by-color. OpenCL parallelizes over test elements and trial elements, and so we have to iterate over the product space of possible color combinations. In Numba, we only parallelise over test elements so it is sufficient to iterate over all possible colors in the test space.
+The compute kernels can then be run colour-by-colour. OpenCL parallelizes over test elements and trial elements, and so we have to iterate over the product space of possible colour combinations. In Numba, we only parallelise over test elements so it is sufficient to iterate over all possible colours in the test space.
 
