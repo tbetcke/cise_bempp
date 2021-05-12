@@ -36,7 +36,7 @@ $$
 $$
 with
 \begin{align*}
-\dmat{A}_{ij} &= \int_{\Gamma}\psi_i(\bx)\int_{\Gamma}g(\bx, \by)\phi_j(\bx)\ds[\by]\ds[\bx]\\
+\dmat{A}_{ij} &= \int_{\Gamma}\psi_i(\bx)\int_{\Gamma}g(\bx, \by)\phi_j(\by)\ds[\by]\ds[\bx]\\
 \dvec{b}_i &= \int_{\Gamma}\psi_i(\bx)f(\bx)\ds[\bx].
 \end{align*}
 In the case of piecewise constant trial and test functions, the definition of $\dmat{A}_{ij}$ simplifies to $\dmat{A}_{ij} = \int_{\tau_i}\int_{\tau_j}g(\bx, \by)\ds[\by]\ds[\bx]$.
@@ -55,7 +55,7 @@ In the final step, \textbf{Bempp-cl solves the underlying linear system of equat
 In summary, to solve a boundary integral equation problem, the following steps are performed by Bempp-cl:
 \begin{enumerate}
 	\item Import of the surface description as triangulation data.
-	\item Definition of the trial space, test space and range space.
+	\item Definition of function spaces and relevant operators.
 	\item Discretization into a matrix problem $\dmat{A}\dvec{x}=\dvec{b}$.
 	\item Solution of the matrix problem by either a direct or iterative solver.
 	\item Evaluation of domain potential operators for visualization and post-processing.
